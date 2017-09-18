@@ -27,7 +27,7 @@ var getGitHubProfile = function(user, callback) {
   });
 };
 
-var getGitHubProfileAsync; // TODO
+var getGitHubProfileAsync = Promise.promisify(getGitHubProfile);
 
 
 // (2) Asyncronous token generation
@@ -38,25 +38,28 @@ var generateRandomToken = function(callback) {
   });
 };
 
-var generateRandomTokenAsync; // TODO
+var generateRandomTokenAsync = Promise.promisify(generateRandomToken);
 
 
 // (3) Asyncronous file manipulation
 var readFileAndMakeItFunny = function(filePath, callback) {
-  fs.readFile(filePath, 'utf8', function(err, file) {
-    if (err) { return callback(err); }
-   
-    var funnyFile = file.split('\n')
-      .map(function(line) {
-        return line + ' lol';
-      })
-      .join('\n');
+  let makeFileFunnyPromise = new Promise((resolve, reject) => {
+    fs.readFile(filePath, 'utf8', function(err, file) {
+      if (err) { return reject(err); }
+     
+      var funnyFile = file.split('\n')
+        .map(function(line) {
+          return line + ' lol';
+        })
+        .join('\n');
 
-    callback(funnyFile);
+      resolve(funnyFile);
+    });
   });
+  return makeFileFunnyPromise;
 };
 
-var readFileAndMakeItFunnyAsync; // TODO
+var readFileAndMakeItFunnyAsync = readFileAndMakeItFunny;
 
 // Export these functions so we can test them and reuse them in later exercises
 module.exports = {
@@ -64,3 +67,5 @@ module.exports = {
   generateRandomTokenAsync: generateRandomTokenAsync,
   readFileAndMakeItFunnyAsync: readFileAndMakeItFunnyAsync
 };
+
+
